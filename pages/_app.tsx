@@ -8,7 +8,8 @@ import {
   AuthPage,
 } from "@pankod/refine-antd";
 import routerProvider from "@pankod/refine-nextjs-router";
-import dataProvider from "@pankod/refine-simple-rest";
+//import dataProvider from "@pankod/refine-simple-rest";
+import { dataProvider } from "../src/dataProvider";
 import "@pankod/refine-antd/dist/reset.css";
 import { AntdInferencer } from "@pankod/refine-inferencer/antd";
 import { appWithTranslation, useTranslation } from "next-i18next";
@@ -24,7 +25,8 @@ import {
 } from "@components/layout";
 import { authProvider } from "src/authProvider";
 
-const API_URL = "https://api.fake-rest.refine.dev";
+// const API_URL = process.env.API_URL;
+const API_URL = "http://127.0.0.1:8000/v1"
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -40,13 +42,15 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
       <RefineKbarProvider>
         <Refine
           routerProvider={routerProvider}
-          dataProvider={dataProvider(API_URL)}
+          dataProvider={{
+              default: dataProvider(API_URL)
+          }}
           notificationProvider={notificationProvider}
           ReadyPage={ReadyPage}
           catchAll={<ErrorComponent />}
           resources={[
             {
-              name: "posts",
+              name: "funnels",
               list: AntdInferencer,
               edit: AntdInferencer,
               show: AntdInferencer,
