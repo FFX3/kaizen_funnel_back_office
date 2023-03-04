@@ -15,7 +15,7 @@ axiosInstance.interceptors.response.use(
             message: error.response?.data?.message,
             statusCode: error.response?.status,
         }
-        console.log(customError.message)
+        console.log(error)
         return Promise.reject(customError)
     }
 )
@@ -71,9 +71,10 @@ export const dataProvider = (apiUrl: string): DataProvider => ({
         }
 
         const queryFilters = generateFilters(filters)
-
+        console.log(url)
         const { data, headers } = await axiosInstance.get(
-            `${url}?${stringify(query)}&${stringify(queryFilters)}`
+            url
+//            `${url}?${stringify(query)}&${stringify(queryFilters)}`
         );
 
         const total = +headers["x-total-count"]

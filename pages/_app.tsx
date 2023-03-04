@@ -24,55 +24,65 @@ import {
   OffLayoutArea,
 } from "@components/layout";
 import { authProvider } from "src/authProvider";
+import { FunnelEdit } from "@components/resources/funnels/edit";
 
-// const API_URL = process.env.API_URL;
-const API_URL = "http://127.0.0.1:8000/v1"
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
-  const { t, i18n } = useTranslation();
+    if(typeof API_URL !== "string"){ throw("Please set NEXT_PUBLIC_API_URL") }
 
-  const i18nProvider = {
-    translate: (key: string, params: object) => t(key, params),
-    changeLocale: (lang: string) => i18n.changeLanguage(lang),
-    getLocale: () => i18n.language,
-  };
+    const { t, i18n } = useTranslation();
 
-  return (
-    <ColorModeContextProvider>
-      <RefineKbarProvider>
-        <Refine
-          routerProvider={routerProvider}
-          dataProvider={{
-              default: dataProvider(API_URL)
-          }}
-          notificationProvider={notificationProvider}
-          ReadyPage={ReadyPage}
-          catchAll={<ErrorComponent />}
-          resources={[
-            {
-              name: "funnels",
-              list: AntdInferencer,
-              edit: AntdInferencer,
-              show: AntdInferencer,
-              create: AntdInferencer,
-              canDelete: true,
-            },
-          ]}
-          Title={Title}
-          Header={Header}
-          Sider={Sider}
-          Footer={Footer}
-          Layout={Layout}
-          OffLayoutArea={OffLayoutArea}
-          authProvider={authProvider}
-          LoginPage={AuthPage}
-          i18nProvider={i18nProvider}
-        >
-          <Component {...pageProps} />
-        </Refine>
-      </RefineKbarProvider>
-    </ColorModeContextProvider>
-  );
+    const i18nProvider = {
+        translate: (key: string, params: object) => t(key, params),
+           changeLocale: (lang: string) => i18n.changeLanguage(lang),
+           getLocale: () => i18n.language,
+    };
+
+    return (
+        <ColorModeContextProvider>
+            <RefineKbarProvider>
+                <Refine
+                    routerProvider={routerProvider}
+                    dataProvider={{
+                        default: dataProvider(API_URL)
+                    }}
+                    notificationProvider={notificationProvider}
+                    ReadyPage={ReadyPage}
+                    catchAll={<ErrorComponent />}
+                    resources={[
+                        {
+                            name: "funnels",
+                            list: AntdInferencer,
+                            edit: FunnelEdit,
+                            show: AntdInferencer,
+                            create: AntdInferencer,
+                            canDelete: true,
+                        },
+                        {
+                            name: "variations",
+                            list: AntdInferencer,
+                            edit: AntdInferencer,
+                            show: AntdInferencer,
+                            create: AntdInferencer,
+                            canDelete: true,
+                        },
+                    ]}
+                    Title={Title}
+                    Header={Header}
+                    Sider={Sider}
+                    Footer={Footer}
+                    Layout={Layout}
+                    OffLayoutArea={OffLayoutArea}
+                    authProvider={authProvider}
+                    LoginPage={AuthPage}
+                    i18nProvider={i18nProvider}
+                >
+                    <Component {...pageProps} />
+                </Refine>
+            </RefineKbarProvider>
+        </ColorModeContextProvider>
+    );
 }
 
 export default appWithTranslation(MyApp);
