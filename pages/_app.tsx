@@ -25,6 +25,7 @@ import {
 } from "@components/layout";
 import { authProvider } from "src/authProvider";
 import { FunnelEdit } from "@components/resources/funnels/edit";
+import { VariationEdit } from "@components/resources/variations/edit";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -61,7 +62,13 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
                         },
                         {
                             name: "variations",
-                            list: AntdInferencer,
+                            edit: VariationEdit,
+                            show: AntdInferencer,
+                            create: AntdInferencer,
+                            canDelete: true,
+                        },
+                        {
+                            name: "steps",
                             edit: AntdInferencer,
                             show: AntdInferencer,
                             create: AntdInferencer,

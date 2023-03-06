@@ -1,32 +1,35 @@
 import React from "react";
 import { IResourceComponentsProps, BaseRecord } from "@pankod/refine-core";
-import { 
+import {
     Edit,
     Form,
     useForm,
     Input,
+    useSelect,
+    Select,
     Table,
-    useTable,
     List,
+    Space,
     EditButton,
-    DeleteButton,
     ShowButton,
-    Space
+    DeleteButton
 } from "@pankod/refine-antd";
 
-export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
+export const VariationEdit: React.FC<IResourceComponentsProps> = () => {
     const { formProps, saveButtonProps, queryResult } = useForm();
 
-    const funnelData = queryResult?.data?.data;
+    const variationsData = queryResult?.data?.data;
 
-    
+    const { selectProps: funnelSelectProps } = useSelect({
+        resource: "funnels",
+        defaultValue: variationsData?.funnel_id,
+        optionLabel: "label",
+    });
+
     const tableProps = {
-        dataSource: funnelData?.variations,
+        dataSource: variationsData?.steps,
         loading: false,
     }
-
-
-    console.log(tableProps)
 
     return (
         <Edit saveButtonProps={saveButtonProps}>
@@ -54,18 +57,18 @@ export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
                     <Input />
                 </Form.Item>
                 <Form.Item
-                    label="slug"
-                    name={["slug"]}
+                    label="Funnel"
+                    name={"funnel_id"}
                     rules={[
                         {
                             required: true,
                         },
                     ]}
                 >
-                    <Input />
+                    <Select {...funnelSelectProps} />
                 </Form.Item>
                 <List 
-                    resource="variations"
+                    resource="steps"
                     breadcrumb=""
                 >
                     <Table {...tableProps} rowKey="id">
@@ -77,19 +80,19 @@ export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
                             render={(_, record: BaseRecord) => (
                                 <Space>
                                     <EditButton
-                                        resourceNameOrRouteName="variations"
+                                        resourceNameOrRouteName="steps"
                                         hideText
                                         size="small"
                                         recordItemId={record.id}
                                     />
                                     <ShowButton
-                                        resourceNameOrRouteName="variations"
+                                        resourceNameOrRouteName="steps"
                                         hideText
                                         size="small"
                                         recordItemId={record.id}
                                     />
                                     <DeleteButton
-                                        resourceNameOrRouteName="variations"
+                                        resourceNameOrRouteName="steps"
                                         hideText
                                         size="small"
                                         recordItemId={record.id}
