@@ -1,5 +1,5 @@
-import React from "react";
-import { IResourceComponentsProps, BaseRecord } from "@pankod/refine-core";
+import React, { useEffect, useState } from "react";
+import { BaseRecord } from "@pankod/refine-core";
 import {
     Edit,
     Form,
@@ -12,10 +12,12 @@ import {
     Space,
     EditButton,
     ShowButton,
-    DeleteButton
+    DeleteButton,
 } from "@pankod/refine-antd";
 
-export const VariationEdit: React.FC<IResourceComponentsProps> = () => {
+import DragDropSortingTable from './DragDropSortingTable'
+
+export const VariationEdit = () => {
     const { formProps, saveButtonProps, queryResult } = useForm();
 
     const variationsData = queryResult?.data?.data;
@@ -71,6 +73,12 @@ export const VariationEdit: React.FC<IResourceComponentsProps> = () => {
                     resource="steps"
                     breadcrumb=""
                 >
+                    <DragDropSortingTable dataSource={tableProps.dataSource} />
+                </List>
+                <List 
+                    resource="steps"
+                    breadcrumb=""
+                >
                     <Table {...tableProps} rowKey="id">
                         <Table.Column dataIndex="id" title="Id" />
                         <Table.Column dataIndex="label" title="Label" />
@@ -106,4 +114,3 @@ export const VariationEdit: React.FC<IResourceComponentsProps> = () => {
         </Edit>
     );
 };
-
