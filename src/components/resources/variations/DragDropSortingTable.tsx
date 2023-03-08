@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { DragEndEvent } from '@dnd-kit/core';
 import { DndContext } from '@dnd-kit/core';
 import {
@@ -48,47 +48,70 @@ const Row = (props: RowProps) => {
   return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
 };
 
-const DragDropSortingTable: React.FC = (props) => {
-  const [dataSource, setDataSource] = useState(props.dataSource);
-
-  useEffect(()=>{
-    setDataSource(props.dataSource)
-  },[props.dataSource])
-
-  if(!dataSource) return <></>
-
-  const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (active.id !== over?.id) {
-      setDataSource((prev) => {
-        const activeIndex = prev.findIndex((i) => i.id === active.id);
-        const overIndex = prev.findIndex((i) => i.id === over?.id);
-        const result = arrayMove(prev, activeIndex, overIndex);
-        console.log(result.map(item => item.id))
-        return result
-      });
+const DragDropSortingTable = (
+    props: {
+        dataSource: any,
+        loading: boolean,
+        onOrderChange: (order: number[]) => void
     }
-  };
+) => {
+    const [dataSource, setDataSource] = useState(props.dataSource)
+    const originalOrder = useRef([])
+    const isLoading = useRef(props.loading)
 
-  return (
-    <DndContext onDragEnd={onDragEnd}>
-      <SortableContext
-        // rowKey array
-        items={dataSource.map((i) => i.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        <Table
-          components={{
-            body: {
-              row: Row,
-            },
-          }}
-          rowKey="id"
-          columns={columns}
-          dataSource={dataSource}
-        />
-      </SortableContext>
-    </DndContext>
-  );
+    useEffect(()=>{
+        if(!isLoading.current && props.loading){
+            originalOrder.current = props.dataSource.map(item => item.id)
+        }
+    },[props.loading])
+
+    useEffect(()=>{
+        setDataSource(props.dataSource)
+    },[props.dataSource])
+
+    if(!dataSource) return <></>
+
+        const onDragEnd = ({ active, over }: DragEndEvent) => {
+            if (active.id !== over?.id) {
+                setDataSource((prev) => {
+                    const activeIndex = prev.findIndex((i) => i.id === active.id);
+                    const overIndex = prev.findIndex((i) => i.id === over?.id);
+                    const newDataSource = arrayMove(prev, activeIndex, overIndex);
+                    const order = newDataSource.map(item => item.id)
+                    let isNewOrder = false
+                    for(let i=0; i<originalOrder.current.length; i++){
+                        if(originalOrder.current[i] !== order[i]){
+                            isNewOrder = true
+                            break;
+                        }
+                    }
+                    if(isNewOrder){
+                        props.onOrderChange(order)
+                    }
+                    return newDataSource
+                });
+            }
+        };
+
+    return (
+        <DndContext onDragEnd={onDragEnd}>
+            <SortableContext
+                items={dataSource.map((i) => i.id)}
+                strategy={verticalListSortingStrategy}
+            >
+            <Table
+                components={{
+                    body: {
+                        row: Row,
+                    },
+                }}
+                rowKey="id"
+                columns={columns}
+                dataSource={dataSource}
+            />
+            </SortableContext>
+        </DndContext>
+    );
 };
 
 export default DragDropSortingTable;
