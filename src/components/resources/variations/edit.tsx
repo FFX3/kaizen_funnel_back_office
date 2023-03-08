@@ -12,19 +12,22 @@ import {
     EditButton,
     ShowButton,
     DeleteButton,
+    CreateButton,
+    Button,
 } from "@pankod/refine-antd";
 
 import DragDropSortingTable from './DragDropSortingTable'
 
 export const VariationEdit = () => {
     const { formProps, saveButtonProps, queryResult } = useForm();
+    const [isNewOrder, setIsNewOrder] = useState(false)
 
     const variationsData = queryResult?.data?.data;
 
     const tableProps = {
         dataSource: variationsData?.steps,
         loading: queryResult?.isFetched ?? false,
-        onOrderChange: (order: number[]) => {
+        saveOrder: (order: number[]) => {
             fetch(process.env.NEXT_PUBLIC_API_URL + `/variations/reorder-steps/${variationsData?.id}`,{
                 method: "PATCH",
                 body: JSON.stringify(order)
@@ -32,6 +35,21 @@ export const VariationEdit = () => {
             console.log(order)
         }
     }
+
+    const listProps = {
+        // doesnt seem to be the right prop
+        extra: (<>
+            <CreateButton
+                size="middle"
+                resourceNameOrRouteName="steps"
+            />
+            {isNewOrder && <Space><Button>reset order</Button></Space>}
+        </>),
+        breadcrumb: '',
+        resourceNameOrRouteName: 'steps'
+    }
+
+    console.log(isNewOrder)
 
     return (
         <Edit saveButtonProps={saveButtonProps}>
@@ -47,11 +65,8 @@ export const VariationEdit = () => {
                 >
                     <Input />
                 </Form.Item>
-                <List 
-                    resource="steps"
-                    breadcrumb=""
-                >
-                    <DragDropSortingTable {...tableProps} />
+                <List {...listProps} >
+                    <DragDropSortingTable setIsNewOrder={setIsNewOrder} {...tableProps} />
                 </List>
             </Form>
         </Edit>

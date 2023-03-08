@@ -8,51 +8,62 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Table } from 'antd';
+import { Button, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React, { useState } from 'react';
+import {
+    Space,
+    EditButton,
+    ShowButton,
+    DeleteButton,
+} from "@pankod/refine-antd";
+import { BaseRecord } from "@pankod/refine-core";
 
 interface DataType {
   id: number;
   title: string;
 }
 
-const columns: ColumnsType<DataType> = [
-  {
-    title: 'Title',
-    dataIndex: 'title',
-  },
-  {
-    title: 'Id',
-    dataIndex: 'id',
-  },
-];
 
 interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   'data-row-key': string;
 }
 
 const Row = (props: RowProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: props['data-row-key'],
-  });
+    const { 
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({
+        id: props['data-row-key'],
+    });
 
-  const style: React.CSSProperties = {
-    ...props.style,
-    transform: CSS.Transform.toString(transform && { ...transform, scaleY: 1 }),
-    transition,
-    cursor: 'move',
-    ...(isDragging ? { position: 'relative', zIndex: 9999 } : {}),
-  };
+    const style: React.CSSProperties = {
+        ...props.style,
+        transform: CSS.Transform.toString(transform && { ...transform, scaleY: 1 }),
+        transition,
+        cursor: 'move',
+        ...(isDragging ? { position: 'relative', zIndex: 9999 } : {}),
+    };
 
-  return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
+    return <tr 
+        {...props} 
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+    />;
 };
 
 const DragDropSortingTable = (
     props: {
         dataSource: any,
         loading: boolean,
-        onOrderChange: (order: number[]) => void
+        saveOrder: (order: number[]) => void,
+        setIsNewOrder: (isNewOrder: boolean) => void,
     }
 ) => {
     const [dataSource, setDataSource] = useState(props.dataSource)
@@ -69,6 +80,55 @@ const DragDropSortingTable = (
         setDataSource(props.dataSource)
     },[props.dataSource])
 
+    if(!dataSource){return <></>}
+
+    const deepEqualArray = (a: any[], b: any[]) => {
+        let isEqual = true
+        for(let i=0; i<a.length; i++){
+            if(a[i] !== b[i]){
+                isEqual = false
+                break;
+            }
+        }
+        return isEqual
+    }
+    
+    const columns: ColumnsType<DataType> = [
+        {
+            title: 'Title',
+            dataIndex: 'title',
+        },
+        {
+            title: 'Id',
+           dataIndex: 'id',
+        },
+        {
+            title: "Actions",
+           render: (_, record: BaseRecord) => (
+               <Space>
+                   <EditButton
+                       hideText
+                       size="small"
+                       recordItemId={record.id}
+                       resourceNameOrRouteName="steps"
+                   />
+                   <ShowButton
+                       hideText
+                       size="small"
+                       recordItemId={record.id}
+                       resourceNameOrRouteName="steps"
+                   />
+                   <DeleteButton
+                       hideText
+                       size="small"
+                       recordItemId={record.id}
+                       resourceNameOrRouteName="steps"
+                   />
+               </Space>
+           )
+        }
+    ];
+
     if(!dataSource) return <></>
 
         const onDragEnd = ({ active, over }: DragEndEvent) => {
@@ -78,16 +138,7 @@ const DragDropSortingTable = (
                     const overIndex = prev.findIndex((i) => i.id === over?.id);
                     const newDataSource = arrayMove(prev, activeIndex, overIndex);
                     const order = newDataSource.map(item => item.id)
-                    let isNewOrder = false
-                    for(let i=0; i<originalOrder.current.length; i++){
-                        if(originalOrder.current[i] !== order[i]){
-                            isNewOrder = true
-                            break;
-                        }
-                    }
-                    if(isNewOrder){
-                        props.onOrderChange(order)
-                    }
+                    props.setIsNewOrder(!deepEqualArray(originalOrder.current, order))
                     return newDataSource
                 });
             }
