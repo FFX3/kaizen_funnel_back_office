@@ -21,6 +21,8 @@ import DragDropSortingTable from './DragDropSortingTable'
 export const VariationEdit = () => {
     const { formProps, saveButtonProps, queryResult } = useForm();
     const [isNewOrder, setIsNewOrder] = useState(false)
+    
+    console.log(formProps)
 
     const variationsData = queryResult?.data?.data;
 
@@ -37,19 +39,18 @@ export const VariationEdit = () => {
     }
 
     const listProps = {
-        // doesnt seem to be the right prop
-        extra: (<>
-            <CreateButton
-                size="middle"
-                resourceNameOrRouteName="steps"
-            />
-            {isNewOrder && <Space><Button>reset order</Button></Space>}
-        </>),
+        headerButtons:()=>{ 
+            return (<>
+                {isNewOrder && <Button>reset order</Button>}
+                <CreateButton
+                    size="middle"
+                    resourceNameOrRouteName="steps"
+                />
+            </>)
+        },
         breadcrumb: '',
         resourceNameOrRouteName: 'steps'
     }
-
-    console.log(isNewOrder)
 
     return (
         <Edit saveButtonProps={saveButtonProps}>
@@ -68,6 +69,11 @@ export const VariationEdit = () => {
                 <List {...listProps} >
                     <DragDropSortingTable setIsNewOrder={setIsNewOrder} {...tableProps} />
                 </List>
+                <Form.Item
+                    name={["order"]}
+                >
+                    <Input type="hidden" />
+                </Form.Item>
             </Form>
         </Edit>
     );
