@@ -16,6 +16,8 @@ import {
     EditButton,
     ShowButton,
     DeleteButton,
+    Form,
+    Input
 } from "@pankod/refine-antd";
 import { BaseRecord } from "@pankod/refine-core";
 
@@ -64,6 +66,7 @@ const DragDropSortingTable = (
         loading: boolean,
         saveOrder: (order: number[]) => void,
         setIsNewOrder: (isNewOrder: boolean) => void,
+        setNewOrder: (newOrder: number[]) => void,
     }
 ) => {
     const [dataSource, setDataSource] = useState(props.dataSource)
@@ -138,7 +141,13 @@ const DragDropSortingTable = (
                     const overIndex = prev.findIndex((i) => i.id === over?.id);
                     const newDataSource = arrayMove(prev, activeIndex, overIndex);
                     const order = newDataSource.map(item => item.id)
-                    props.setIsNewOrder(!deepEqualArray(originalOrder.current, order))
+                    if(!deepEqualArray(originalOrder.current, order)){
+                        props.setNewOrder(order)
+                        props.setIsNewOrder(true)
+                    }else{
+                        props.setNewOrder([])
+                        props.setIsNewOrder(false)
+                    }
                     return newDataSource
                 });
             }

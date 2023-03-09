@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { BaseRecord } from "@pankod/refine-core";
 import {
     Edit,
@@ -21,21 +21,35 @@ import DragDropSortingTable from './DragDropSortingTable'
 export const VariationEdit = () => {
     const { formProps, saveButtonProps, queryResult } = useForm();
     const [isNewOrder, setIsNewOrder] = useState(false)
+    const [newOrder, setNewOrder] = useState([])
+    const originalOrder = useRef([])
     
-    console.log(formProps)
+    useEffect(()=>{
+        const form = formProps.form
+        if(form){
+            if(isNewOrder){
+                form.setFieldValue("step_order", newOrder)
+            } else {
+                form.setFieldValue("step_order", undefined)
+            }
+        }
+    },[newOrder])
 
     const variationsData = queryResult?.data?.data;
+    const isLoading = queryResult?.isFetched ?? false 
+    const dataSource = variationsData?.steps
+
+    useEffect(()=>{
+        if(!(typeof isLoading === "undefined") && isLoading){
+            originalOrder.current = dataSource.map(item => item.id)
+        }
+    },[isLoading])
 
     const tableProps = {
         dataSource: variationsData?.steps,
         loading: queryResult?.isFetched ?? false,
-        saveOrder: (order: number[]) => {
-            fetch(process.env.NEXT_PUBLIC_API_URL + `/variations/reorder-steps/${variationsData?.id}`,{
-                method: "PATCH",
-                body: JSON.stringify(order)
-            })
-            console.log(order)
-        }
+        setNewOrder,
+        setIsNewOrder,
     }
 
     const listProps = {
@@ -67,12 +81,13 @@ export const VariationEdit = () => {
                     <Input />
                 </Form.Item>
                 <List {...listProps} >
-                    <DragDropSortingTable setIsNewOrder={setIsNewOrder} {...tableProps} />
+                    <DragDropSortingTable {...tableProps} />
                 </List>
                 <Form.Item
-                    name={["order"]}
+                    name={["step_order"]}
+                    hidden={true}
                 >
-                    <Input type="hidden" />
+                    <Input />
                 </Form.Item>
             </Form>
         </Edit>
