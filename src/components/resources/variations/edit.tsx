@@ -56,10 +56,12 @@ export const VariationEdit = () => {
         headerButtons:()=>{ 
             return (<>
                 {isNewOrder && <Button>reset order</Button>}
-                <CreateButton
+                <Button
                     size="middle"
-                    resourceNameOrRouteName="steps"
-                />
+                    href={`/steps/create?variation_id=${variationsData?.id}&order=${variationsData?.steps.length}`}
+                >
+                    Create
+                </Button>
             </>)
         },
         breadcrumb: '',

@@ -28,6 +28,7 @@ import { FunnelEdit } from "@components/resources/funnels/edit";
 import { VariationEdit } from "@components/resources/variations/edit";
 import { StepEdit } from "@components/resources/steps/edit";
 import { VariationCreate } from "@components/resources/variations/create";
+import { StepCreate } from "@components/resources/steps/create";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -73,7 +74,7 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
                             name: "steps",
                             edit: StepEdit,
                             show: AntdInferencer,
-                            create: AntdInferencer,
+                            create: StepCreate,
                             canDelete: true,
                         },
                     ]}

@@ -11,7 +11,8 @@ import {
     EditButton,
     DeleteButton,
     ShowButton,
-    Space
+    Space,
+    Button
 } from "@pankod/refine-antd";
 
 export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
@@ -22,6 +23,19 @@ export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
     const tableProps = {
         dataSource: funnelData?.variations,
         loading: false,
+    }
+    const listProps = {
+        headerButtons: (
+            <Button
+                size="middle"
+                href={`/variations/create?funnel_id=${funnelData?.id}`}
+            >
+                Create
+            </Button>
+        ),
+        breadcrumb: '',
+        resourceNameOrRouteName: 'steps',
+        title: 'Steps'
     }
 
     return (
@@ -60,13 +74,7 @@ export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
                 >
                     <Input />
                 </Form.Item>
-                <List 
-                    resource="variations"
-                    breadcrumb=""
-                    createButtonProps={{
-                        //resourceNameOrRouteName:`/variations/create?funnel_id=${funnelData?.id}`,
-                    }}
-                >
+                <List {...listProps} >
                     <Table {...tableProps} rowKey="id">
                         <Table.Column dataIndex="id" title="Id" />
                         <Table.Column dataIndex="label" title="Label" />
