@@ -15,7 +15,7 @@ export const StepCreate: React.FC<IResourceComponentsProps> = () => {
     
     const query = router.query
 
-    const { formProps, saveButtonProps, queryResult } = useForm({ redirect: "create" });
+    const { formProps, saveButtonProps, queryResult } = useForm({ redirect: "edit" });
 
     const { selectProps: variationSelectProps } = useSelect({
         resource: "variations",
