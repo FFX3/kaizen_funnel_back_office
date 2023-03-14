@@ -11,7 +11,7 @@ import {
 } from "@pankod/refine-antd";
 
 export const StepEdit: React.FC<IResourceComponentsProps> = () => {
-    const { formProps, saveButtonProps, queryResult } = useForm();
+    const { formProps, saveButtonProps, queryResult } = useForm({ redirect: "edit" });
 
     const stepsData = queryResult?.data?.data;
 
@@ -22,7 +22,12 @@ export const StepEdit: React.FC<IResourceComponentsProps> = () => {
     });
 
     return (
-        <Edit saveButtonProps={saveButtonProps}>
+        <Edit 
+            saveButtonProps={saveButtonProps}
+            title="Edit Variation"
+            resource="variation"
+            recordItemId={stepsData?.variation_id}
+        >
             <Form {...formProps} layout="vertical">
                 <Form.Item
                     label="Id"

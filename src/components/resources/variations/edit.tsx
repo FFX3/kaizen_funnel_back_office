@@ -70,7 +70,12 @@ export const VariationEdit = () => {
     }
 
     return (
-        <Edit saveButtonProps={saveButtonProps}>
+        <Edit 
+            saveButtonProps={saveButtonProps}
+            title="Edit Funnel"
+            resource="funnel"
+            recordItemId={variationsData?.funnel_id}
+        >
             <Form {...formProps} layout="vertical">
                 <Form.Item
                     label="Label"
