@@ -19,14 +19,10 @@ export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
 
     const funnelData = queryResult?.data?.data;
 
-    
     const tableProps = {
         dataSource: funnelData?.variations,
         loading: false,
     }
-
-
-    console.log(tableProps)
 
     return (
         <Edit saveButtonProps={saveButtonProps}>
@@ -67,6 +63,9 @@ export const FunnelEdit: React.FC<IResourceComponentsProps> = () => {
                 <List 
                     resource="variations"
                     breadcrumb=""
+                    createButtonProps={{
+                        //resourceNameOrRouteName:`/variations/create?funnel_id=${funnelData?.id}`,
+                    }}
                 >
                     <Table {...tableProps} rowKey="id">
                         <Table.Column dataIndex="id" title="Id" />

@@ -63,7 +63,8 @@ export const VariationEdit = () => {
             </>)
         },
         breadcrumb: '',
-        resourceNameOrRouteName: 'steps'
+        resourceNameOrRouteName: 'steps',
+        title: 'Steps'
     }
 
     return (
