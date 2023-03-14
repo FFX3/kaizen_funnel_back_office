@@ -13,12 +13,29 @@ export async function getServerSideProps(context) {
 
 
     return {props: {
-        content: content ?? null
+        content: content ?? null,
+        step_id: params.id
     }}
+
 }
 
-export default function Page({ content }) {
+export default function Page({ content, step_id }) {
+    const saveProjectData = (grapesjsProjectData: string) => {
+        console.log(grapesjsProjectData)
+        const payload = JSON.stringify({
+            grapesjs: JSON.stringify(grapesjsProjectData)
+        })
+        const options = {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: payload
+        };
+
+        fetch(`${API_URL}/steps/${step_id}/content`, options)
+    }
+
     return <Editor
         content={content}
+        saveContent={saveProjectData}
     />
 }

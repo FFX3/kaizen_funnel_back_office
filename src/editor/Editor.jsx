@@ -12,7 +12,7 @@ import Column1 from './components/Columns';
 import Forms from './components/Forms';
 import EditableCode from './components/EditableCode';
 
-export default function Editor({ content }) {
+export default function Editor({ content, saveContent }) {
 
     const [editor, setEditor] = useState(null)
 
@@ -42,21 +42,21 @@ export default function Editor({ content }) {
     }
 
     useEffect(()=>{
-        if(content){
+        if(content && editor){
             editor.loadProjectData(content)
         } else {
 
         }
-    },[editor])
+    },[editor, content])
 
-    const saveContent = () => {
-        pushContent(editor)
+    const handleSaveButtonClick = async () => {
+        saveContent(await editor.getProjectData())
     }
     
 
     return <div>
     <InnerHtml html={css} />
-    <button onClick={saveContent}>save</button>
+    <button onClick={handleSaveButtonClick}>save</button>
     <GrapesjsReact
         id='grapesjs-react'
         plugins={[
