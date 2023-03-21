@@ -59,9 +59,6 @@ export default function Editor({ content, saveContent }) {
     <button onClick={handleSaveButtonClick}>save</button>
     <GrapesjsReact
         id='grapesjs-react'
-        style={{
-            height: "97vh"
-        }}
         plugins={[
             editor => webpageDefaultPlugin(editor, {
                 blocks: ['link-block', 'quote', 'text-basic'],
@@ -87,14 +84,18 @@ export default function Editor({ content, saveContent }) {
             editor => EditableCode(editor, {})
         ]}
         canvas = {{
-            styles: ['https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap']
+            styles: [
+                'https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap',
+                'https://fonts.googleapis.com/css2?family=Inter:wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap',
+            ]
         }}
         allowScripts={true}
         onInit={async(editor)=>{
             setEditor(editor)
             editor.on('load', ()=>{
+                document.getElementById('grapesjs-react').style = "width: 100%; height: 95vh;"
+
                 let styleManager = editor.StyleManager;
-                console.log(styleManager)
                 let typographySector = styleManager.getSector('typography');
                 let fontProperty = styleManager.getProperty('typography', 'font-family');
                 let list = fontProperty.attributes.options;
