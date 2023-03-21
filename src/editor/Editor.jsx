@@ -59,6 +59,9 @@ export default function Editor({ content, saveContent }) {
     <button onClick={handleSaveButtonClick}>save</button>
     <GrapesjsReact
         id='grapesjs-react'
+        style={{
+            height: "97vh"
+        }}
         plugins={[
             editor => webpageDefaultPlugin(editor, {
                 blocks: ['link-block', 'quote', 'text-basic'],
