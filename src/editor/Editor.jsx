@@ -27,29 +27,45 @@ export default function Editor({ content, saveContent }) {
 
     const handleSaveButtonClick = async () => {
         const projectData = await editor.getProjectData()
-        const recursivelyReplaceBase64 = (item) => {
+        const recursivelyReplaceBase64 = async (item) => {
             if(typeof item !== 'object'){return}
             if(Array.isArray(item)){
-                item.forEach((subItem)=>{
-                    recursivelyReplaceBase64(subItem)
+                const promises = []
+                item.forEach(async (subItem)=>{
+                    promises.push(recursivelyReplaceBase64(subItem))
                 })
+                await Promise.all(promises)
                 return
             }
             const src = item.src
             if(typeof src !== 'string'){return}
             if(src.startsWith('data:image/')){
-                //todo add storage bucket upload here
-                //todo change to my rust api to not expose bucket keys
 
-                console.log(src)
+                const payload = JSON.stringify({
+                    base64: src,
+                    file_name: item.name
+                })
+                const options = {
+                    method: 'post',
+                    headers: {'Content-Type': 'application/json'},
+                    body: payload
+                };
+
+                //TODO should be parallel request
+                const data = await fetch(process.env.NEXT_PUBLIC_API_URL + '/media', options)
+                    .then(response=>response.json())
+                    //.then(data=>item.src = data.bucket_url)
+                item.src = data.bucket_url
+
             }
-            Object.keys(item).forEach((key)=>{
-                recursivelyReplaceBase64(item[key])
+            const promises = []
+            Object.keys(item).forEach(async (key)=>{
+                promises.push(recursivelyReplaceBase64(item[key]))
             })
+            await Promise.all(promises)
         }
-        recursivelyReplaceBase64(projectData.assets)
-        console.log(projectData)
-        //saveContent(projectData)
+        await recursivelyReplaceBase64(projectData.assets)
+        saveContent(projectData)
     }
     
 

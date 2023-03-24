@@ -11,6 +11,9 @@ export async function getServerSideProps(context) {
         .then(response => response.json())
         .catch(err => console.error(err));  
 
+    context.res.setHeader('Cache-Control', 'no-store')
+
+    console.log(content)
 
     return {props: {
         content: content ?? null,
