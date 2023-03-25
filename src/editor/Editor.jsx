@@ -27,45 +27,66 @@ export default function Editor({ content, saveContent }) {
 
     const handleSaveButtonClick = async () => {
         const projectData = await editor.getProjectData()
+        const assetMapAddPromises = []
+        const assetMap = new Map()
+        projectData.assets.forEach((asset, index)=>{
+            assetMapAddPromises.push((async () => {
+                let mappedTo = assetMap.get(asset.src)
+                if(asset.src.startsWith('data:image/') && !mappedTo){
+
+                    const payload = JSON.stringify({
+                        base64: asset.src,
+                        file_name: asset.name
+                    })
+                    const options = {
+                        method: 'post',
+                        headers: {'Content-Type': 'application/json'},
+                        body: payload
+                    };
+                    await fetch(process.env.NEXT_PUBLIC_API_URL + '/media/base64/upload', options)
+                        .then(response=>response.json())
+                        .then(data=>assetMap.set(asset.src, data.bucket_url))
+                        .catch(error=>console.log(error))
+                    return
+                }
+            })())
+        })
+        await Promise.all(assetMapAddPromises)
+        projectData.assets = projectData.assets.map((asset)=>{
+            let newSrc = assetMap.get(asset.src)
+            if(newSrc) {
+                asset.src = newSrc
+            }
+            return asset
+        })
         const recursivelyReplaceBase64 = async (item) => {
             if(typeof item !== 'object'){return}
+            const promises = []
             if(Array.isArray(item)){
-                const promises = []
                 item.forEach(async (subItem)=>{
                     promises.push(recursivelyReplaceBase64(subItem))
                 })
                 await Promise.all(promises)
                 return
             }
-            const src = item.src
-            if(typeof src !== 'string'){return}
-            if(src.startsWith('data:image/')){
-
-                const payload = JSON.stringify({
-                    base64: src,
-                    file_name: item.name
-                })
-                const options = {
-                    method: 'post',
-                    headers: {'Content-Type': 'application/json'},
-                    body: payload
-                };
-
-                //TODO should be parallel request
-                const data = await fetch(process.env.NEXT_PUBLIC_API_URL + '/media', options)
-                    .then(response=>response.json())
-                    //.then(data=>item.src = data.bucket_url)
-                item.src = data.bucket_url
-
-            }
-            const promises = []
             Object.keys(item).forEach(async (key)=>{
                 promises.push(recursivelyReplaceBase64(item[key]))
             })
+            const src = item.src
+            if(typeof src === 'string'){
+                let newSrc = assetMap.get(item.src)
+                if(newSrc) {
+                    item.src = newSrc
+                } else {
+                    console.log(`mapping for ${item.src} not found`)
+                }
+            }
             await Promise.all(promises)
         }
-        await recursivelyReplaceBase64(projectData.assets)
+        await recursivelyReplaceBase64(projectData.pages)
+        await recursivelyReplaceBase64(projectData.styles)
         saveContent(projectData)
+        editor.loadProjectData(projectData)
     }
     
 
@@ -74,6 +95,9 @@ export default function Editor({ content, saveContent }) {
     <button onClick={handleSaveButtonClick}>save</button>
     <GrapesjsReact
         id='grapesjs-react'
+        assetManager={{
+            upload: (process.env.NEXT_PUBLIC_API_URL + "/media/upload")
+        }}
         plugins={[
             editor => webpageDefaultPlugin(editor, {
                 blocks: ['link-block', 'quote', 'text-basic'],
@@ -88,7 +112,6 @@ export default function Editor({ content, saveContent }) {
                     }
                 }
             }),
-            // editor => grapesjsTailwind(editor, {}),
             editor => CalendlyFormPlugin(editor, {}),
             editor => List(editor, {}),
             editor => Column1(editor, {}),
