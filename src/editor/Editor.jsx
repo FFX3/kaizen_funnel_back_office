@@ -10,6 +10,7 @@ import List from './components/List';
 import Column1 from './components/Columns';
 import Forms from './components/Forms';
 import EditableCode from './components/EditableCode';
+import BasicBlocks from 'grapesjs-blocks-basic'
 
 export default function Editor({ content, saveContent }) {
 
@@ -100,7 +101,7 @@ export default function Editor({ content, saveContent }) {
         }}
         plugins={[
             editor => webpageDefaultPlugin(editor, {
-                blocks: ['link-block', 'quote', 'text-basic'],
+                blocks: ['link-block', 'quote', 'text-basic', ],
                 block: (blockId) => {
                     return {
                         label: 'Heading 1',
@@ -116,7 +117,8 @@ export default function Editor({ content, saveContent }) {
             editor => List(editor, {}),
             editor => Column1(editor, {}),
             editor => Forms(editor, {}),
-            editor => EditableCode(editor, {})
+            editor => EditableCode(editor, {}),
+            editor => BasicBlocks(editor, {}),
         ]}
         canvas = {{
             styles: [
